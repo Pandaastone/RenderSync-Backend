@@ -14,6 +14,10 @@ DB_FILE = 'rendersync.db'
 def init_db():
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
+
+    # 👇 加入这一行，彻底解除 SQLite 的读写互斥锁，支持高并发！
+    c.execute('PRAGMA journal_mode=WAL;')
+    
     c.execute('''
         CREATE TABLE IF NOT EXISTS render_nodes (
             machine_id TEXT PRIMARY KEY,
