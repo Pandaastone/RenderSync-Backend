@@ -2,6 +2,7 @@ import sqlite3
 import time
 import json
 import subprocess
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -134,10 +135,13 @@ def verify_key():
 @app.route('/api/deploy', methods=['POST'])
 def auto_deploy():
     try:
-        # 1. 让服务器自动去 GitHub 拉取最新代码
-        subprocess.run(["git", "pull", "origin", "main"], check=True)
+        # 1. 明确指定你的项目工作目录（修复拉取迷路问题）
+        repo_dir = "/home/zacharyshee/mysite"
         
-        # 2. 触碰 WSGI 配置文件，强制 PythonAnywhere 瞬间重启服务器！
+        # 强制在这个目录下执行 git pull
+        subprocess.run(["git", "pull", "origin", "main"], cwd=repo_dir, check=True)
+        
+        # 2. 你的真实用户名 zacharyshee 的重启开关路径
         wsgi_path = "/var/www/zacharyshee_pythonanywhere_com_wsgi.py"
         subprocess.run(["touch", wsgi_path], check=True)
         
